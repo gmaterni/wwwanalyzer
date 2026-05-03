@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:,">
+    <title>RAGINDEX - DB Explorer</title>
+    <style>
+        :root {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --text-primary: #f0f0f0;
+            --text-secondary: #a0a0a0;
+            --accent: #00c853;
+            --accent-hover: #21e670;
+            --error: #b71c1c;
+            --border: #404040;
+            --sidebar-width: 180px;
+            --header-height: 50px;
+            --editor-height: 90px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar sinistra - fixed position */
+        aside {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            overflow-y: auto;
+            z-index: 50;
+        }
+
+        /* Toolbar colonne in alto alla sidebar */
+        .sidebar-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-toolbar .toolbar-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            flex: 1;
+            cursor: help;
+            border-bottom: 1px dotted var(--text-secondary);
+        }
+
+        #show-all-cols-btn {
+            font-size: 20px;
+            filter: drop-shadow(0 0 4px rgba(0, 200, 83, 0.5));
+        }
+
+        /* Header in alto - fixed position */
+        header {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            height: var(--header-height);
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 100;
+        }
+
+        .header-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-group label {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        /* Main Content - si attacca alla sidebar */
+        main {
+            position: fixed;
+            left: var(--sidebar-width);
+            top: var(--header-height);
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Editor SQL */
+        .editor-section {
+            height: var(--editor-height);
+            flex-shrink: 0;
+            padding: 10px;
+            background-color: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .editor-row {
+            display: flex;
+            gap: 10px;
+            height: 100%;
+        }
+
+        #sql-editor {
+            flex: 1;
+            height: 100%;
+            background-color: #000;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            resize: none;
+        }
+
+        /* Tabella risultati */
+        .results-section {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-secondary);
+        }
+
+        .table-wrapper {
+            flex: 1;
+            overflow: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap;
+        }
+
+        th {
+            position: sticky;
+            top: 0;
+            background-color: #333;
+            color: var(--text-primary);
+            padding: 0;
+            text-align: left;
+            border-bottom: 2px solid var(--border);
+            z-index: 10;
+        }
+
+        th .th-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+        }
+
+        th .th-content label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            flex: 1;
+            min-width: 0;
+        }
+
+        th .th-content input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        th .th-content .col-label {
+            font-weight: 600;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        th .sort-icon {
+            cursor: pointer;
+            opacity: 0.5;
+            font-size: 12px;
+            user-select: none;
+            padding: 4px;
+            flex-shrink: 0;
+        }
+
+        th .sort-icon:hover {
+            opacity: 1;
+        }
+
+        th .sort-icon.active {
+            opacity: 1;
+            color: var(--accent);
+        }
+
+        td {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        tr.selected {
+            background-color: rgba(0, 200, 83, 0.15) !important;
+        }
+
+        tr.selected td {
+            color: var(--text-primary);
+        }
+
+        /* Controlli sidebar */
+        .filter-group, .sidebar-query-group {
+            margin-bottom: 10px;
+        }
+
+        .filter-group label, .sidebar-query-group label {
+            display: block;
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .filter-select, .sidebar-query-select {
+            width: 100%;
+            padding: 6px 8px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        .filter-select:focus, .sidebar-query-select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Bottoni */
+        button {
+            padding: 8px 14px;
+            background-color: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        button.secondary {
+            background-color: #424242;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        button.secondary:hover {
+            background-color: #555;
+        }
+
+        button.danger {
+            background-color: var(--error);
+            color: white;
+        }
+
+        button.danger:hover {
+            background-color: #d32f2f;
+        }
+
+        button.danger:disabled {
+            background-color: #555;
+            color: #888;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        button.warning {
+            background-color: #ff9800;
+            color: #000;
+        }
+
+        button.warning:hover {
+            background-color: #ffb74d;
+        }
+
+        button.icon-btn {
+            padding: 6px 10px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button.icon-btn:hover {
+            color: var(--accent);
+        }
+
+        /* Error display */
+        #error-display {
+            color: #ff5252;
+            background-color: rgba(255, 82, 82, 0.1);
+            padding: 8px 12px;
+            display: none;
+            border: 1px solid #ff5252;
+            font-size: 12px;
+        }
+
+        .env-select {
+            padding: 8px 12px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            border: 2px solid var(--accent);
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .env-select:hover {
+            border-color: var(--accent-hover);
+            box-shadow: 0 0 8px rgba(0, 200, 83, 0.3);
+        }
+
+        .env-select:focus {
+            outline: none;
+            border-color: var(--accent-hover);
+            box-shadow: 0 0 12px rgba(0, 200, 83, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <div class="sidebar-toolbar">
+            <button id="show-all-cols-btn" class="icon-btn" title="Mostra tutte le colonne: clicca per rendere visibili tutte le colonne nascoste">👁️</button>
+            <span class="toolbar-label" title="Usa i checkbox nell'header della tabella per mostrare/nascondere le colonne">Colonne</span>
+        </div>
+
+        <div class="sidebar-query-group">
+            <label for="sidebar-query-select">Query</label>
+            <select id="sidebar-query-select" class="sidebar-query-select">
+                <option value="">-- Seleziona --</option>
+                <option value="SELECT * FROM analytics ORDER BY created_at DESC LIMIT 100">Ultimi 100 eventi</option>
+                <option value="SELECT app_name, COUNT(*) as count FROM analytics GROUP BY app_name">Conteggio per app</option>
+                <option value="SELECT action_name, COUNT(*) as count FROM analytics GROUP BY action_name ORDER BY count DESC LIMIT 10">Top 10 azioni</option>
+                <option value="SELECT * FROM analytics WHERE created_at > datetime('now', '-7 days')">Ultimi 7 giorni</option>
+                <option value="SELECT user_id, COUNT(*) as count FROM analytics GROUP BY user_id ORDER BY count DESC LIMIT 20">Eventi per user</option>
+                <option value="SELECT DATE(created_at) as date, COUNT(*) as count FROM analytics GROUP BY DATE(created_at) ORDER BY date DESC LIMIT 30">Media eventi/giorno</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="filter-app">Applicazione</label>
+            <select id="filter-app" class="filter-select">
+                <option value="">Tutte</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="filter-action">Azione</label>
+            <select id="filter-action" class="filter-select">
+                <option value="">Tutte</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="filter-user">User</label>
+            <select id="filter-user" class="filter-select">
+                <option value="">Tutti</option>
+            </select>
+        </div>
+    </aside>
+
+    <header>
+        <div class="header-group">
+            <select id="env-select" class="env-select" title="Cambia ambiente: Locale o Remoto">
+                <option value="local">Locale</option>
+                <option value="remote">Remoto</option>
+            </select>
+            <span id="current-url" style="font-size: 10px; color: var(--text-secondary); white-space: nowrap;">http://localhost:8787</span>
+        </div>
+        <div class="header-actions">
+            <button id="execute-btn">Esegui</button>
+            <button id="clear-btn" class="secondary" title="Pulisci il risultato della query">Pulisci</button>
+            <button id="delete-selected-btn" class="warning" disabled title="Elimina le righe selezionate dalla tabella">✕ Elimina</button>
+            <button id="danger-clear-btn" class="danger">Svuota DB</button>
+        </div>
+    </header>
+
+    <main>
+        <div id="error-display"></div>
+
+        <section class="editor-section">
+            <div class="editor-row">
+                <textarea id="sql-editor" spellcheck="false">SELECT * FROM analytics ORDER BY created_at DESC LIMIT 50</textarea>
+            </div>
+        </section>
+
+        <section class="results-section">
+            <div class="table-wrapper">
+                <table id="results-table">
+                    <thead id="results-head"></thead>
+                    <tbody id="results-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/query.js" type="module"></script>
+    <script src="js/table.js" type="module"></script>
+    <script src="js/app.js" type="module"></script>
+</body>
+</html>

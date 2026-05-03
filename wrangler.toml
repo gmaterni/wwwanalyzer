@@ -1,0 +1,20 @@
+# Backend API Worker - RAGINDEX
+# Deploy: npx wrangler deploy
+# Dev locale: npx wrangler dev
+
+name = "wwwanalyzer-backend"
+main = "wwwanalyzer-backend/src/index.js"
+compatibility_date = "2025-02-13"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+#CLEAR_KEY=ragindex-secret-clear-2026
+
+[[d1_databases]]
+binding = "DB"
+database_name = "wwwanalyzer-db"
+database_id = "3bf52427-d7e7-4ee2-9c4b-38ec3f462430"
+migrations_dir = "wwwanalyzer-backend/migrations"
+

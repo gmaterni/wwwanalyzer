@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="data:,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WWWANALYZER - Hub</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #f0f0f0;
+            font-family: system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 { color: #4a9eff; margin-bottom: 30px; font-weight: 300; letter-spacing: 1px; }
+        .nav { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+        .card {
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #404040;
+            text-decoration: none;
+            color: white;
+            width: 240px;
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s, background-color 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #4a9eff;
+            background-color: #252525;
+        }
+        .card h2 { margin: 0 0 10px 0; font-size: 1.4rem; color: #4a9eff; }
+        .card p { font-size: 0.95rem; color: #a0a0a0; margin: 0; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <h1>WWWANALYZER ANALYTICS</h1>
+
+    <div class="nav">
+        <a href="/wwwanalyzer-cli/index.html" target="_blank" class="card">
+            <h2>Test Client</h2>
+            <p>Invia eventi manualmente e monitora i log in tempo reale.</p>
+        </a>
+        <a href="/wwwanalyzer-db/index.html" target="_blank" class="card">
+            <h2>DB Explorer</h2>
+            <p>Analisi avanzata dei dati tramite query SQL interattive.</p>
+        </a>
+    </div>
+
+</body>
+</html>

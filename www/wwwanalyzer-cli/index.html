@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:,">
+    <title>RAGINDEX - Test Client</title>
+    <style>
+        :root {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --text-primary: #f0f0f0;
+            --text-secondary: #a0a0a0;
+            --accent: #4a9eff;
+            --accent-hover: #6db1ff;
+            --error: #b71c1c;
+            --success: #00c853;
+            --border: #404040;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 0;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        main {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        h1, h2 {
+            color: var(--accent);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: 2px solid var(--accent);
+            border-color: transparent;
+        }
+
+        button {
+            padding: 12px 24px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        #status-message {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .status-success {
+            display: block !important;
+            background-color: var(--success);
+            color: white;
+        }
+
+        .status-error {
+            display: block !important;
+            background-color: var(--error);
+            color: white;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: var(--bg-primary);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.1em;
+        }
+
+        tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.07);
+        }
+
+        .config-panel {
+            font-size: 14px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+        }
+
+        #worker-url-display {
+            font-family: monospace;
+            background: #000;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #4a9eff;
+        }
+    </style>
+</head>
+<body>
+    <div style="position: fixed; top: 10px; right: 10px; background: #1e1e1e; padding: 10px; border-radius: 8px; border: 1px solid #444; font-size: 0.8rem; z-index: 1000;">
+        <label><input type="radio" name="env" value="local" checked> Locale</label>
+        <label style="margin-left: 10px;"><input type="radio" name="env" value="remote"> Remoto</label>
+    </div>
+
+    <main>
+        <h1>RAGINDEX Test Client</h1>
+
+        <div class="config-panel">
+            <span>Ambiente: <strong id="env-display" style="color: var(--accent);">Locale</strong></span>
+            <span style="margin-left: 10px;">|</span>
+            <span style="margin-left: 10px;">Worker URL: <code id="worker-url-display" style="color: var(--text-primary); background: #000; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border);">http://localhost:8787</code></span>
+        </div>
+
+        <section class="card">
+            <h2>Invia Evento</h2>
+            <form id="event-form">
+                <div class="form-group">
+                    <label for="app-name">App Name (lascia vuoto per vedere tutto)</label>
+                    <input type="text" id="app-name" value="" placeholder="es. test-app, ragindex">
+                </div>
+                <div class="form-group">
+                    <label for="action-name">Action Name</label>
+                    <input type="text" id="action-name" placeholder="es. click_button, page_view" required>
+                </div>
+                <button type="submit" id="submit-btn">Invia Evento</button>
+            </form>
+            <div id="status-message"></div>
+        </section>
+
+        <section class="card">
+            <h2>Ultimi Eventi</h2>
+            <div class="table-container">
+                <table id="events-table">
+                    <thead>
+                        <tr>
+                            <th>Data/Ora</th>
+                            <th>App</th>
+                            <th>Azione</th>
+                            <th>User ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="events-body">
+                        <!-- Caricamento dinamico -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/sender.js" type="module"></script>
+    <script src="js/reader.js" type="module"></script>
+    <script src="js/app.js" type="module"></script>
+</body>
+</html>

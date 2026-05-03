@@ -1,0 +1,9 @@
+# Frontend Pages - RAGINDEX WWW
+# Deploy: npx wrangler pages deploy www
+# Dev locale: npx wrangler pages dev www
+
+name = "wwwanalyzer-frontend"
+compatibility_date = "2025-02-13"
+
+[observability]
+enabled = true
