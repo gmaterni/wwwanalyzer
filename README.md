@@ -1,4 +1,4 @@
-# RAGINDEX - Analytics Multi-App System
+# WWWANALYZER - Analytics Multi-App System
 
 Sistema universale di tracciamento eventi e analytics basato su **Cloudflare Workers** e **D1 Database**. Progettato per essere integrato in qualsiasi applicazione web con zero dipendenze esterne.
 
@@ -20,11 +20,11 @@ npx wrangler pages deploy www # Deploy
 
 Il sistema è strutturato in modo modulare:
 
-- **/ragindex**: Il nucleo del sistema (Backend). Un Cloudflare Worker che gestisce le API REST e l'interfaccia con il database SQLite D1.
+- **/wwwanalyzer-backend**: Il nucleo del sistema (Backend). Un Cloudflare Worker che gestisce le API REST e l'interfaccia con il database SQLite D1.
 - **/www**: Il portale di controllo e monitoraggio (Frontend).
   - `index.html`: Home con auto-logging e switch di ambiente (Locale/Remoto).
-  - `ragindex-cli/`: Client di test per l'invio manuale di eventi.
-  - `ragindex-db/`: Explorer SQL interattivo per l'analisi dei dati e la manutenzione.
+  - `wwwanalyzer-cli/`: Client di test per l'invio manuale di eventi.
+  - `wwwanalyzer-db/`: Explorer SQL interattivo per l'analisi dei dati e la manutenzione.
 
 ---
 
@@ -44,7 +44,7 @@ import { UaSender } from "./path/to/sender.js";
 
 // Configurazione (URL e ID Utente opzionale)
 const config = {
-    workerUrl: "https://ragindex.tuo-subdominio.workers.dev",
+    workerUrl: "https://wwwanalyzer.tuo-subdominio.workers.dev",
     userId: "utente_test_01" // Opzionale
 };
 
