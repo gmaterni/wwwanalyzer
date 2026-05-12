@@ -6,7 +6,7 @@ Tutti i comandi seguenti devono essere eseguiti dalla **directory root** del pro
 Se non lo hai già fatto, autentica il tuo terminale:
 ```bash
 # Dalla root del progetto:
-npx wrangler login
+wrangler login
 ```
 
 ## 2. Creazione del Database D1
@@ -35,14 +35,14 @@ Imposta la chiave segreta sul server remoto (necessaria per le operazioni protet
 Pubblica il codice delle API:
 ```bash
 # Dalla root del progetto:
-wrangler deploy
+./bin/wrangler_deploy_worker.sh
 ```
 
 ## 6. Deploy del Frontend (Pages)
 Pubblica l'interfaccia utente:
 ```bash
 # Dalla root del progetto:
-./bin/wrangler_deploy_www.sh
+./bin/wrangler_deploy_pages.sh
 ```
 
 ---

@@ -12,16 +12,16 @@ npx wrangler deploy       # Deploy
 
 ### Frontend (Pages)
 ```bash
-npx wrangler pages dev www   # Sviluppo locale
-npx wrangler pages deploy www # Deploy
+npx wrangler pages dev pages   # Sviluppo locale
+npx wrangler pages deploy pages # Deploy
 ```
 
 ## ARCHITETTURA DEL PROGETTO
 
 Il sistema è strutturato in modo modulare:
 
-- **/wwwanalyzer-backend**: Il nucleo del sistema (Backend). Un Cloudflare Worker che gestisce le API REST e l'interfaccia con il database SQLite D1.
-- **/www**: Il portale di controllo e monitoraggio (Frontend).
+- **/worker**: Il nucleo del sistema (Backend). Un Cloudflare Worker che gestisce le API REST e l'interfaccia con il database SQLite D1.
+- **/pages**: Il portale di controllo e monitoraggio (Frontend).
   - `index.html`: Home con auto-logging e switch di ambiente (Locale/Remoto).
   - `wwwanalyzer-cli/`: Client di test per l'invio manuale di eventi.
   - `wwwanalyzer-db/`: Explorer SQL interattivo per l'analisi dei dati e la manutenzione.

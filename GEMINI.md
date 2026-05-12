@@ -14,10 +14,10 @@ Il progetto (noto anche come **RAGINDEX**) è un sistema modulare per la raccolt
 
 ## 📁 Struttura della Directory
 
-- `wwwanalyzer-backend/`: Il nucleo del sistema (Backend).
+- `worker/`: Il nucleo del sistema (Backend).
   - `src/index.js`: Handler principale del Worker con endpoint API REST.
   - `migrations/`: Script SQL per l'inizializzazione del database D1.
-- `www/`: Il portale di controllo e monitoraggio (Frontend).
+- `pages/`: Il portale di controllo e monitoraggio (Frontend).
   - `wwwanalyzer-cli/`: Client di test per simulare l'invio di eventi.
   - `wwwanalyzer-db/`: Explorer SQL interattivo per query e manutenzione.
   - `js/sender.js`: Modulo universale ES6 per l'integrazione in app esterne.
@@ -40,7 +40,7 @@ Oppure manualmente:
 npx wrangler dev
 
 # Frontend
-npx wrangler pages dev www
+npx wrangler pages dev pages
 ```
 
 ### Deploy
@@ -49,13 +49,13 @@ npx wrangler pages dev www
 npx wrangler deploy
 
 # Frontend
-npx wrangler pages deploy www
+npx wrangler pages deploy pages
 ```
 
 ## 📝 Convenzioni di Sviluppo
 
 - **Backend**: Scritto in Vanilla JavaScript (CommonJS/ESM). Gli endpoint seguono il pattern `/api/analytics` e `/api/query`.
-- **Database**: Le modifiche allo schema devono essere effettuate tramite migrazioni in `wwwanalyzer-backend/migrations/`.
+- **Database**: Le modifiche allo schema devono essere effettuate tramite migrazioni in `worker/migrations/`.
 - **Integrazione Client**: Per tracciare eventi in nuove applicazioni, importare `UaSender` da `sender.js`.
 - **Sicurezza**: 
   - Le query SQL raw sono limitate ai soli comandi `SELECT`.
@@ -63,6 +63,6 @@ npx wrangler pages deploy www
 - **Lingua**: Commenti nel codice in italiano, nomi di variabili e file in inglese.
 
 ## 🔍 Note per l'AI
-- Quando si lavora sul backend, fare riferimento a `wwwanalyzer-backend/src/index.js`.
+- Quando si lavora sul backend, fare riferimento a `worker/src/index.js`.
 - Il database D1 è collegato tramite il binding `DB`.
 - Consultare `docs/ARCHITETTURA.md` per una comprensione profonda dei flussi dati.

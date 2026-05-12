@@ -3,7 +3,7 @@
 Il file `sender.js` è l'unico componente necessario per integrare il tracciamento in applicazioni esterne.
 
 ## 1. Installazione
-Copia il file `www/WWWANALYZER-cli/js/sender.js` nel tuo progetto.
+Copia il file `pages/wwwanalyzer-cli/js/sender.js` nel tuo progetto.
 
 ## 2. Inizializzazione
 Importa il modulo e inizializzalo con l'URL del tuo Worker:

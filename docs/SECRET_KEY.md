@@ -13,8 +13,8 @@ Il sistema utilizza una chiave denominata `CLEAR_KEY` che deve essere inviata da
 In locale, il sistema è progettato per funzionare "out-of-the-box" con una chiave predefinita.
 
 - **Chiave di Default**: `ragindex-secret-clear-2026`
-- **Configurazione Backend**: Definita come fallback nel file `wwwanalyzer-backend/src/index.js`.
-- **Configurazione Frontend**: Definita nella costante `DEFAULT_LOCAL_KEY` in `www/wwwanalyzer-db/js/app.js`.
+- **Configurazione Backend**: Definita come fallback nel file `worker/src/index.js`.
+- **Configurazione Frontend**: Definita nella costante `DEFAULT_LOCAL_KEY` in `pages/wwwanalyzer-db/js/app.js`.
 
 **Nota**: Non è necessario configurare nulla per lo sviluppo locale a meno che non si desideri cambiare la chiave di default.
 
@@ -26,7 +26,7 @@ In produzione, la chiave **NON deve essere scritta nel codice** del backend per 
 
 - **Chiave Attuale**: `Mgiuseppe_0_` (cablata nel frontend per semplicità in questa fase).
 - **Configurazione Backend**: Gestita tramite i segreti di Wrangler (`wrangler secret`).
-- **Configurazione Frontend**: Definita nella costante `REMOTE_KEY` in `www/wwwanalyzer-db/js/app.js`.
+- **Configurazione Frontend**: Definita nella costante `REMOTE_KEY` in `pages/wwwanalyzer-db/js/app.js`.
 
 ### Come cambiare la chiave remota:
 
@@ -34,13 +34,13 @@ In produzione, la chiave **NON deve essere scritta nel codice** del backend per 
     ```bash
     ./bin/set_secret_key.sh NUOVA_CHIAVE_MOLTO_LUNGA
     ```
-2.  **Aggiorna il Frontend**: Modifica la variabile `REMOTE_KEY` nel file `www/wwwanalyzer-db/js/app.js`:
+2.  **Aggiorna il Frontend**: Modifica la variabile `REMOTE_KEY` nel file `pages/wwwanalyzer-db/js/app.js`:
     ```javascript
     const REMOTE_KEY = "NUOVA_CHIAVE_MOLTO_LUNGA";
     ```
 3.  **Deploy del Frontend**:
     ```bash
-    npx wrangler pages deploy www
+    npx wrangler pages deploy pages
     ```
 
 ---

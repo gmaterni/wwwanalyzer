@@ -8,18 +8,18 @@ WWWANALYZER è un sistema modulare per il tracciamento di eventi e analytics. Qu
 
 Il progetto è organizzato in modo che ogni cartella abbia un ruolo specifico e isolato:
 
-### 1. `/WWWANALYZER` (Backend - Cloudflare Worker)
+### 1. `/worker` (Backend - Cloudflare Worker)
 Questa è l'intelligenza del sistema. È un **Worker** che riceve le richieste e comunica con il database.
 - `src/index.js`: Il codice principale. Qui vengono gestiti gli endpoint API (`/api/analytics`, `/api/query`, ecc.).
 - `migrations/`: Contiene i file SQL (es. `0001_init.sql`) per creare le tabelle nel database D1.
 - `wrangler.toml`: File di configurazione del Worker (nome, ID del database, variabili d'ambiente).
 
-### 2. `/www` (Frontend - Cloudflare Pages)
+### 2. `/pages` (Frontend - Cloudflare Pages)
 Contiene l'interfaccia web per visualizzare e testare il sistema. È ospitata su **Cloudflare Pages**.
 - `index.html`: La "Hub" o pagina principale. Permette di navigare tra il Test Client e l'Explorer.
-- `/WWWANALYZER-cli/`: **Client di Test**. Simula un'applicazione esterna che invia dati al sistema.
+- `/wwwanalyzer-cli/`: **Client di Test**. Simula un'applicazione esterna che invia dati al sistema.
   - `js/sender.js`: Il modulo "universale" che puoi copiare nei tuoi progetti per inviare eventi.
-- `/WWWANALYZER-db/`: **SQL Explorer**. Un'interfaccia per vedere i dati salvati e lanciare query SELECT manuali.
+- `/wwwanalyzer-db/`: **SQL Explorer**. Un'interfaccia per vedere i dati salvati e lanciare query SELECT manuali.
 - `/worker-db/`: Script di utilità per gestire il database SQLite locale durante lo sviluppo.
 
 ### 3. `/bin` (Automazione e Script)
@@ -41,10 +41,10 @@ Tutte le guide specifiche:
 
 Il funzionamento segue questo percorso logico:
 
-1. **Origine**: Un'app esterna (o il nostro `WWWANALYZER-cli`) usa `sender.js` per inviare un pacchetto JSON al Worker.
-2. **Elaborazione**: Il Worker (`/WWWANALYZER/src/index.js`) riceve il JSON, aggiunge i metadati (IP, timestamp, ecc.) e valida i dati.
+1. **Origine**: Un'app esterna (o il nostro `wwwanalyzer-cli`) usa `sender.js` per inviare un pacchetto JSON al Worker.
+2. **Elaborazione**: Il Worker (`/worker/src/index.js`) riceve il JSON, aggiunge i metadati (IP, timestamp, ecc.) e valida i dati.
 3. **Persistenza**: Il Worker scrive i dati nel database **D1 (SQLite)**.
-4. **Visualizzazione**: L'interfaccia web (`/www/WWWANALYZER-db`) interroga il Worker tramite query SQL per mostrare i risultati a video.
+4. **Visualizzazione**: L'interfaccia web (`/pages/wwwanalyzer-db`) interroga il Worker tramite query SQL per mostrare i risultati a video.
 
 ---
 
