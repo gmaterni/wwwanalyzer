@@ -28,7 +28,7 @@
 
 - Binding: `DB` (definito in `wrangler.toml`).
 - Nome: `wwwanalyzer-db` (locale e remoto usano lo stesso nome).
-- Migrazioni: `worker/migrations/0001_init.sql`.
+- Migrazioni: `worker/migrations/0001_init.sql` e `0002_add_ip.sql` (aggiunge colonna `ip` + `idx_ip`).
 - Solo query `SELECT` sono permesse via API (`/api/query`). `DELETE`/`INSERT`/`UPDATE`/`ALTER`/`TRUNCATE` sono bloccate anche se mascherate.
 
 ## API Endpoint (Routing manuale in `worker/src/index.js`)

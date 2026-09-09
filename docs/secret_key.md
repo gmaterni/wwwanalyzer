@@ -5,7 +5,7 @@
 ## Ambiente locale
 
 - **Chiave di default:** `ragindex-secret-clear-2026`
-- Hardcoded come fallback in `worker/src/index.js:184` (`handleDeleteClear`) e `:212` (`handlePostDelete`), e come `DEFAULT_LOCAL_KEY` in `pages/wwwanalyzer-db/js/app.js`
+- Hardcoded come fallback in `worker/src/index.js` (`handleDeleteClear` e `handlePostDelete`, `env.CLEAR_KEY || "ragindex-secret-clear-2026"`), e come `DEFAULT_LOCAL_KEY` in `pages/wwwanalyzer-db/js/app.js:13`
 - Funziona out-of-the-box, nessuna configurazione necessaria
 
 Per cambiare la chiave locale, modifica entrambi i file (Worker e frontend) con lo stesso valore.

@@ -29,7 +29,7 @@ Il sistema è strutturato in modo modulare:
 - **/pages**: Il portale di controllo e monitoraggio (Frontend).
   - `index.html`: Hub statico di navigazione tra CLI e DB Explorer (nessun auto-logging, nessuno switch ambiente).
   - `wwwanalyzer-cli/`: Client di test per l'invio manuale di eventi, con switch ambiente Locale/Remoto (radio button) e auto-logging dell'apertura (`wwwanalyzer-cli/open`).
-  - `wwwanalyzer-db/`: Explorer SQL interattivo per l'analisi dei dati e la manutenzione, con selettore ambiente Locale/Remoto.
+  - `wwwanalyzer-db/`: Explorer SQL interattivo per l'analisi dei dati e la manutenzione, con selettore ambiente Locale/Remoto e sidebar Query con 9 scorciatoie (tra cui `LIMIT 1000` con campi espliciti e `Eventi per IP`).
 
 ---
 

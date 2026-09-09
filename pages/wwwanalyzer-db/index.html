@@ -400,7 +400,7 @@
                 <option value="">-- Seleziona --</option>
                 <option value="SELECT * FROM analytics ORDER BY created_at DESC LIMIT 1000">Ultimi 1000 eventi</option>
                 <option value="SELECT id, app_name, user_id, action_name, user_agent, timezone, language, referrer, url_params, timestamp, ip, created_at FROM analytics ORDER BY created_at DESC LIMIT 1000">Ultimi 1000 eventi (campi espliciti)</option>
-                <option value="SELECT id, app_name, action_name, user_id, ip, created_at FROM analytics ORDER BY created_at DESC LIMIT 1000">Ultimi 1000 eventi</option>
+                <option value="SELECT id, app_name, action_name, user_id, ip, created_at FROM analytics ORDER BY created_at DESC LIMIT 1000">Ultimi 1000 eventi (vista ridotta)</option>
                 <option value="SELECT ip, COUNT(*) as count FROM analytics GROUP BY ip ORDER BY count DESC LIMIT 20">Eventi per IP</option>
                 <option value="SELECT app_name, COUNT(*) as count FROM analytics GROUP BY app_name">Conteggio per app</option>
                 <option value="SELECT action_name, COUNT(*) as count FROM analytics GROUP BY action_name ORDER BY count DESC LIMIT 10">Top 10 azioni</option>

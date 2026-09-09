@@ -76,12 +76,16 @@ e che il radio sia su Locale (vedi problemi comuni sotto).
 1. Torna all'Hub (`http://localhost:8788`) e apri **DB Explorer**.
 2. Nel selettore in alto scegli **Locale** (l'URL mostrato deve essere `http://localhost:8787`).
 3. Nell'editor c'è già `SELECT * FROM analytics ORDER BY created_at DESC LIMIT 50`: clicca **Esegui**
-   (oppure `Ctrl+Enter`).
+   (oppure `Ctrl+Enter`). Il limite di default è 50 per non sovraccaricare la tabella, ma puoi
+   aumentarlo: la sidebar **Query** contiene le scorciatoie `Ultimi 1000 eventi`, `Ultimi 1000 eventi (campi espliciti)`,
+   `Ultimi 1000 eventi` con selezione ridotta (`id, app_name, action_name, user_id, ip, created_at`) e `Eventi per IP`
+   (`SELECT ip, COUNT(*) ... GROUP BY ip`), tutte con `LIMIT 1000` (massimo consentito dall'API `GET /api/analytics`, vedi `architettura.md`).
 4. Devi vedere il tuo evento `test-app / click_prova` con tutti i metadati
    (`user_agent`, `timezone`, `language`, `referrer`, `url_params`, `timestamp`, `created_at`, `ip`).
    In locale `ip` può essere `127.0.0.1` o `NULL` (l'header non sempre c'è in `wrangler dev`): è normale.
 5. Prova contatore: esegui `SELECT COUNT(*) as cnt FROM analytics` e verifica che il numero cresca
-   a ogni invio.
+   a ogni invio. Prova anche `SELECT ip, COUNT(*) as count FROM analytics GROUP BY ip ORDER BY count DESC LIMIT 20`
+   per verificare il raggruppamento per IP.
 
 Prova di sicurezza (facoltativa): esegui `DELETE FROM analytics` nel DB Explorer.
 Devi ricevere `"Only SELECT queries are allowed"`: le query libere accettano solo `SELECT`.

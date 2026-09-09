@@ -17,7 +17,7 @@ WWWANALYZER è un sistema di tracciamento eventi e analytics basato su Cloudflar
 wwwanalyzer/
   worker/                 # Backend Cloudflare Worker
     src/index.js           #   Entrypoint UNICO: routing manuale, gestione API
-    migrations/            #   Migrazioni D1 (0001_init.sql)
+    migrations/            #   Migrazioni D1 (0001_init.sql, 0002_add_ip.sql)
     package.json           #   Solo metadati; "type": "commonjs" ma export è ESM
   pages/                   # Frontend Cloudflare Pages
     index.html             #   Hub di navigazione tra CLI e DB Explorer
@@ -27,10 +27,10 @@ wwwanalyzer/
       js/reader.js         #   Lettura eventi dal Worker
       js/app.js            #   Controller Test Client
     wwwanalyzer-db/        #   SQL Explorer per analisi dati e manutenzione
-      index.html
+      index.html           #   Editor SQL + sidebar Query (9 scorciatoie con LIMIT 1000, es. campi espliciti e Eventi per IP)
       js/query.js          #   Esecuzione query SQL via /api/query
       js/table.js          #   Rendering tabella risultati
-      js/app.js            #   Controller DB Explorer
+      js/app.js            #   Controller DB Explorer (gestione CLEAR_KEY, filtri, env)
   bin/                     # Script di automazione (sviluppo, deploy, clone)
   docs/                    # Documentazione
   wrangler.toml            # Config Worker backend (puntato da root)
@@ -108,7 +108,15 @@ Elimina righe per ID. Richiede header `X-Clear-Key`.
 
 Esegue SQL raw (solo SELECT). **Bloccate:** `DROP`, `DELETE`, `INSERT`, `UPDATE`, `ALTER`, `TRUNCATE` anche se mascherate (test regex case-insensitive). La violazione restituisce 403.
 
+Esempi validi (sidebar DB Explorer, `pages/wwwanalyzer-db/index.html`):
+- `SELECT * FROM analytics ORDER BY created_at DESC LIMIT 1000` — ultimi eventi
+- `SELECT id, app_name, user_id, action_name, user_agent, timezone, language, referrer, url_params, timestamp, ip, created_at FROM analytics ORDER BY created_at DESC LIMIT 1000` — campi espliciti
+- `SELECT id, app_name, action_name, user_id, ip, created_at FROM analytics ORDER BY created_at DESC LIMIT 1000` — vista ridotta
+- `SELECT ip, COUNT(*) as count FROM analytics GROUP BY ip ORDER BY count DESC LIMIT 20` — eventi per IP
+
 ## Schema database (D1)
+
+Migrazioni: `0001_init.sql` (tabella + indici `app_name`, `action_name`, `created_at`) e `0002_add_ip.sql` (`ALTER TABLE ADD COLUMN ip TEXT` + `idx_ip`). Lo schema finale è:
 
 Tabella `analytics`:
 
@@ -134,7 +142,7 @@ Indici: `app_name`, `action_name`, `created_at`, `ip`.
 1. Un'app esterna (o `pages/wwwanalyzer-cli/`) chiama `POST /api/analytics` via `sender.js`
 2. Il Worker valida i campi obbligatori (`appName`, `userId`, `actionName`) e restituisce 400 se mancanti
 3. Il Worker legge l'IP del chiamante dagli header e scrive il record in D1 tramite `env.DB.prepare(...).bind(...).run()`
-4. Il frontend (`pages/wwwanalyzer-db/`) interroga i dati via `POST /api/query` con SQL SELECT arbitrario
+4. Il frontend (`pages/wwwanalyzer-db/`) interroga i dati via `POST /api/query` con SQL SELECT arbitrario (sidebar con 9 query predefinite, con `LIMIT 1000` max)
 5. Le operazioni di cancellazione (`DELETE /api/analytics/clear`, `POST /api/analytics/delete`) richiedono header `X-Clear-Key` con valore corrispondente a `CLEAR_KEY`
 
 ## Sicurezza

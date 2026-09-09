@@ -88,8 +88,11 @@ Dettagli e rotazione chiavi in `secret_key.md`.
 1. Apri **DB Explorer** (ambiente Remoto).
 2. Esegui la query già presente nell'editor
    (`SELECT * FROM analytics ORDER BY created_at DESC LIMIT 50`) con **Esegui**.
+   Per carichi maggiori usa le scorciatoie della sidebar **Query**: `Ultimi 1000 eventi`, `Ultimi 1000 eventi (campi espliciti)`
+   e `Eventi per IP` (`SELECT ip, COUNT(*) ... GROUP BY ip`), tutte con `LIMIT 1000` (massimo API).
 3. Ritrovati `test-app-remota / click_prova` con tutti i metadati.
-4. Per isolare la prova: `SELECT * FROM analytics WHERE app_name = 'test-app-remota' ORDER BY created_at DESC LIMIT 10`.
+4. Per isolare la prova: `SELECT * FROM analytics WHERE app_name = 'test-app-remota' ORDER BY created_at DESC LIMIT 10`
+   oppure la variante ridotta `SELECT id, app_name, action_name, user_id, ip, created_at FROM analytics ORDER BY created_at DESC LIMIT 1000`.
 
 Nota: in locale e in remoto vedi dati diversi, è normale: sono due database D1 distinti.
 
