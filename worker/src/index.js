@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * Cloudflare Worker per la gestione degli Analytics RAGINDEX.
+ * Cloudflare Worker per la gestione degli Analytics WWWANALYZER.
  * Gestisce la registrazione di eventi, il recupero dati e le query SQL raw.
  */
 
@@ -56,12 +56,18 @@ const handlePostAnalytics = async function(request, env) {
   const urlParams = body.urlParams ? JSON.stringify(body.urlParams) : null;
   const timestamp = body.timestamp || Math.floor(Date.now() / 1000);
 
+  // IP del chiamante letto server-side (non dal body, non falsificabile dal client).
+  // In locale l'header può mancare: in tal caso resta NULL.
+  const forwarded = request.headers.get("X-Forwarded-For") || "";
+  const firstForwarded = forwarded.split(",")[0].trim() || null;
+  const ip = request.headers.get("CF-Connecting-IP") || firstForwarded || null;
+
   let result = null;
   try {
     const insertResult = await env.DB.prepare(
-      "INSERT INTO analytics (app_name, user_id, action_name, user_agent, timezone, language, referrer, url_params, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+      "INSERT INTO analytics (app_name, user_id, action_name, user_agent, timezone, language, referrer, url_params, timestamp, ip) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     )
-    .bind(appName, userId, actionName, userAgent, timezone, language, referrer, urlParams, timestamp)
+    .bind(appName, userId, actionName, userAgent, timezone, language, referrer, urlParams, timestamp, ip)
     .run();
     
     result = _createJsonResponse({ success: true, id: insertResult.meta.last_row_id }, 201);
@@ -82,6 +88,7 @@ const handleGetAnalytics = async function(request, env) {
   const appName = url.searchParams.get("appName");
   const actionName = url.searchParams.get("actionName");
   const userId = url.searchParams.get("userId");
+  const ip = url.searchParams.get("ip");
 
   let query = "SELECT * FROM analytics WHERE 1=1";
   const params = [];
@@ -97,6 +104,10 @@ const handleGetAnalytics = async function(request, env) {
   if (userId) {
     query += " AND user_id = ?";
     params.push(userId);
+  }
+  if (ip) {
+    query += " AND ip = ?";
+    params.push(ip);
   }
 
   query += " ORDER BY created_at DESC LIMIT ?";
@@ -194,7 +205,12 @@ const handleDeleteClear = async function(request, env) {
 
   let result = null;
   try {
-    const dbResult = await env.DB.prepare("DELETE FROM analytics").run();
+    const batchResult = await env.DB.batch([
+      env.DB.prepare("DELETE FROM analytics"),
+      // Azzera il contatore AUTOINCREMENT così il prossimo ID riparte da 1
+      env.DB.prepare("DELETE FROM sqlite_sequence WHERE name = 'analytics'")
+    ]);
+    const dbResult = batchResult[0];
     result = _createJsonResponse({ success: true, deleted: dbResult.meta.rows_written });
   } catch (error) {
     console.error("handleDeleteClear: DB Error", error);

@@ -6,8 +6,8 @@
  * Supporta la disattivazione automatica in ambiente locale.
  *
  * @module  services/sender
- * @version 1.0.2
- * @date    2026-05-03
+ * @version 1.1.0
+ * @date    2026-09-03
  * @author  Gemini CLI
  */
 
@@ -17,8 +17,8 @@
 // CONFIGURAZIONE DI SISTEMA
 // ============================================================================
 
-/** @type {boolean} Se true, impedisce l'invio degli eventi in ambiente locale. */
-const DISABLE_ON_LOCAL = false;
+/** @type {boolean} Valore di default per il salto invio in ambiente locale (sovrascrivibile via init). */
+const DEFAULT_DISABLE_ON_LOCAL = false;
 
 
 // ============================================================================
@@ -32,6 +32,7 @@ const DISABLE_ON_LOCAL = false;
 const _config = {
     workerUrl: "http://localhost:8787",
     userId: null,
+    disableOnLocal: DEFAULT_DISABLE_ON_LOCAL,
     isInitialized: false
 };
 
@@ -87,6 +88,7 @@ export const UaSender = {
      * @param {Object} options - Opzioni di configurazione.
      * @param {string} options.workerUrl - URL base del worker (es: https://wwwanalyzer-backend.workerua.workers.dev)
      * @param {string} options.userId - Identificativo unico dell'utente.
+     * @param {boolean} options.disableOnLocal - Se true, salta l'invio su localhost/127.0.0.1/file:.
      */
     init: function (options = {}) {
         if (options.workerUrl) {
@@ -97,8 +99,12 @@ export const UaSender = {
             _config.userId = options.userId;
         }
 
+        if (typeof options.disableOnLocal === "boolean") {
+            _config.disableOnLocal = options.disableOnLocal;
+        }
+
         _config.isInitialized = true;
-        console.info(`[RAGINDEX] Sender pronto. URL: ${_config.workerUrl}`);
+        console.info(`[WWWANALYZER] Sender pronto. URL: ${_config.workerUrl}`);
     },
 
     /**
@@ -116,7 +122,7 @@ export const UaSender = {
         }
 
         // 2. Controllo Ambiente Locale
-        if (DISABLE_ON_LOCAL && _isLocalEnvironment()) {
+        if (_config.disableOnLocal && _isLocalEnvironment()) {
             console.info("UaSender.sendEventAsync: invio saltato (ambiente locale)");
             return { success: true, skipped: true };
         }
